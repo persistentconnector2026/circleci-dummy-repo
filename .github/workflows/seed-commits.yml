@@ -1,0 +1,33 @@
+name: Seed CircleCI Pipelines
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of commits to create'
+        required: true
+        default: '87'
+
+permissions:
+  contents: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git
+        run: |
+          git config user.name "seed-bot"
+          git config user.email "seed-bot@users.noreply.github.com"
+
+      - name: Create commits
+        run: |
+          for i in $(seq 1 ${{ github.event.inputs.count }}); do
+            echo "seed trigger $i $(date -u +%FT%TZ)" >> seed-trigger.txt
+            git add seed-trigger.txt
+            git commit -m "seed: trigger pipeline $i"
+            git push origin main
+            sleep 2
+          done
