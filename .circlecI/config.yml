@@ -1,0 +1,53 @@
+version: 2.1
+
+parameters:
+  test_run_id:
+    type: string
+    default: "manual"
+
+jobs:
+  noop:
+    docker:
+      - image: cimg/base:current-22.04
+    resource_class: small
+    steps:
+      - run: echo "seed pipeline test_run_id=<< pipeline.parameters.test_run_id >>"
+
+  matrix-job:
+    parameters:
+      index:
+        type: integer
+    docker:
+      - image: cimg/base:current-22.04
+    resource_class: small
+    steps:
+      - run: echo "matrix job index=<< parameters.index >>"
+
+  test-results:
+    docker:
+      - image: cimg/base:current-22.04
+    resource_class: small
+    steps:
+      - run:
+          name: Generate synthetic JUnit XML
+          command: |
+            mkdir -p test-results
+            python3 - <<'PY'
+            with open('test-results/junit.xml', 'w') as f:
+                f.write('<testsuite name="seed" tests="500">\n')
+                for i in range(500):
+                    f.write(f'<testcase classname="seed" name="test-{i}"/>\n')
+                f.write('</testsuite>\n')
+            PY
+      - store_test_results:
+          path: test-results
+
+workflows:
+  seed-workflow:
+    jobs:
+      - noop
+      - matrix-job:
+          matrix:
+            parameters:
+              index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      - test-results
