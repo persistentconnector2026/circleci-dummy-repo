@@ -24,24 +24,24 @@ jobs:
       - run: echo "matrix job index=<< parameters.index >>"
 
   test-results:
-  docker:
-    - image: cimg/python:3.12
-  resource_class: small
-  steps:
-    - run:
-        name: Generate synthetic JUnit XML
-        command: |
-          python3 -c '
-          import os
-          os.makedirs("test-results", exist_ok=True)
-          with open("test-results/junit.xml", "w") as f:
-              f.write("<testsuite name=\"seed\" tests=\"500\">\n")
-              for i in range(500):
-                  f.write("<testcase classname=\"seed\" name=\"case %d\" time=\"0.01\"/>\n" % i)
-              f.write("</testsuite>\n")
-          '
-    - store_test_results:
-        path: test-results
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
+    steps:
+      - run:
+          name: Generate synthetic JUnit XML
+          command: |
+            python3 -c '
+            import os
+            os.makedirs("test-results", exist_ok=True)
+            with open("test-results/junit.xml", "w") as f:
+                f.write("<testsuite name=\"seed\" tests=\"500\">\n")
+                for i in range(500):
+                    f.write("<testcase classname=\"seed\" name=\"case %d\" time=\"0.01\"/>\n" % i)
+                f.write("</testsuite>\n")
+            '
+      - store_test_results:
+          path: test-results
 
 workflows:
   seed-workflow:
