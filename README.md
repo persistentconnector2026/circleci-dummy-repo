@@ -13,3 +13,4 @@ fix indentation issue
 
 fix issue identafion
 1
+seed trigger 6
